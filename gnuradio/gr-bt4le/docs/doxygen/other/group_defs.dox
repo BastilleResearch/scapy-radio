@@ -1,0 +1,7 @@
+/*!
+ * \defgroup block GNU Radio BT4LE C++ Signal Processing Blocks
+ * \brief All C++ blocks that can be used from the BT4LE GNU Radio
+ *        module are listed here or in the subcategories below.
+ *
+ */
+

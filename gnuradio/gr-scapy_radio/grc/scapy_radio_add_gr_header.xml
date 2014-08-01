@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<block>
+  <name>Add GR header</name>
+  <key>scapy_radio_add_gr_header</key>
+  <category>Scapy Radio</category>
+  <import>import scapy_radio</import>
+  <make>scapy_radio.add_gr_header($protocol_id)</make>
+  <callback>set_protocol_id($protocol_id)</callback>
+  <param>
+    <name>Protocol</name>
+    <key>protocol_id</key>
+    <type>int</type>
+  </param>
+  <check>$protocol_id &gt; 0 and $protocol_id &lt; 256</check>
+  <sink>
+    <name>in</name>
+    <type>message</type>
+  </sink>
+  <source>
+    <name>out</name>
+    <type>message</type>
+  </source>
+</block>

@@ -1,0 +1,10 @@
+syntax: glob
+*.o
+*.pyc
+*~
+*.orig
+*.rej
+.idea/
+
+*/build/*
+gnuradio/grc/*.py
