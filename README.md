@@ -22,6 +22,10 @@ It includes:
 
 You need to have a full working GNU Radio 3.7 installation.
 
+**Note**: You will need to edit GRC files if you are running with GNU Radio 3.7.5+
+because they changed the UHD Sink block (there is now 2 inputs, the first one being
+for commands instead of samples).
+
 The provided GRC files have been fully tested with an Ettus B210 SDR but they
 should work just as fine with any other UHD compatible device.
 
