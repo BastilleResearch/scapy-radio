@@ -12,9 +12,6 @@ import re, struct
 
 from scapy.packet import *
 from scapy.fields import *
-from scapy.layers import zigbee
-from scapy.layers import sixlowpan
-from scapy.layers import xbee
 
 
 ### Fields ###
@@ -196,6 +193,9 @@ class Dot15d4Data(Packet):
         return self.sprintf("802.15.4 Data ( %Dot15d4Data.src_panid%:%Dot15d4Data.src_addr% -> %Dot15d4Data.dest_panid%:%Dot15d4Data.dest_addr% )")
 
     def guess_payload_class(self, payload):
+        from scapy.layers import zigbee
+        from scapy.layers import sixlowpan
+        from scapy.layers import xbee
         if Padding not in xbee.Xbee(payload):
             return xbee.Xbee
         if Padding not in zigbee.ZigbeeNWK(payload):
