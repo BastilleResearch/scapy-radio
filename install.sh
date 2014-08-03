@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Copyright (C) Airbus DS CyberSecurity, 2014
+# Authors: Jean-Michel Picod, Arnaud Lebrun, Jonathan Christofer Demay
+
 scapy_install() {
   cd scapy && sudo python2 setup.py install && cd ..
 }

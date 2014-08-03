@@ -1,7 +1,7 @@
 ## This file is for use with Scapy
 ## See http://www.secdev.org/projects/scapy for more information
-## Copyright (C) Ryan Speers <ryan@rmspeers.com> 2011-2012
-## 2012-03-10 Roger Meyer <roger.meyer@csus.edu>: Added frames
+## Copyright (C) Airbus DS CyberSecurity
+## Authors: Jean-Michel Picod, Arnaud Lebrun, Jonathan Christofer Demay
 ## This program is published under a GPLv2 license
 
 """

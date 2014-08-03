@@ -1,3 +1,9 @@
+## This file is for use with Scapy
+## See http://www.secdev.org/projects/scapy for more information
+## Copyright (C) Airbus DS CyberSecurity
+## Authors: Jean-Michel Picod, Arnaud Lebrun, Jonathan Christofer Demay
+## This program is published under a GPLv2 license
+
 """Bluetooth 4LE layer"""
 
 import socket, struct

@@ -1,6 +1,7 @@
 /* -*- c++ -*- */
 /* 
- * Copyright 2014 Jean-Michel Picod - Airbus DS CyberSecurity.
+ * Copyright 2014 Airbus DS CyberSecurity.
+ * Authors: Jean-Michel Picod, Arnaud Lebrun, Jonathan Christofer Demay
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
