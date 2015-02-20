@@ -34,8 +34,8 @@ blocks_install() {
 
 if [ $# -eq 0 ]; then
   scapy_install
-  grc_install
   blocks_install
+  grc_install
 else
   while [ $# -ne 0 ]; do
     case $1 in
