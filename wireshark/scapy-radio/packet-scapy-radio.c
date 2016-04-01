@@ -73,8 +73,7 @@ dissect_scapy(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
     guint i;
 
 	/* make entries in protocol column and info column on summary display */
-	if (check_col(pinfo->cinfo, COL_PROTOCOL))
-		col_set_str(pinfo->cinfo, COL_PROTOCOL, "scapy_radio");
+	col_set_str(pinfo->cinfo, COL_PROTOCOL, "scapy_radio");
 
 	subproto = tvb_get_guint8(tvb, 0);
 	if (length > GNURADIO_HEADER_LENGTH) {

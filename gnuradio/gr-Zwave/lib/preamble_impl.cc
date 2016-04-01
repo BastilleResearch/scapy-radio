@@ -84,7 +84,7 @@ void preamble_impl::general_work (pmt::pmt_t msg){
     std::memcpy(temp, pmt::blob_data(blob), data_len);
     if(temp[0] == ZWAVE){
 
-    std::memcpy(preamble + 1 + PREAMBLE_SIZE, pmt::blob_data(blob)+8, data_len-8); // blob_data+1 to remove the 2 byte header
+    std::memcpy(preamble + 1 + PREAMBLE_SIZE, ((const char*)pmt::blob_data(blob))+8, data_len-8); // blob_data+1 to remove the 2 byte header
 
     //2 byte added at the end of the packet
     preamble[data_len+1+PREAMBLE_SIZE-8] = 0xAA;

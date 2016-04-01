@@ -95,7 +95,7 @@ void preamble_prefixer_impl::make_frame (pmt::pmt_t msg) {
 	assert(data_len < 256 - 1);
 
 
-	std::memcpy(preamble + 3, pmt::blob_data(blob) +8, data_len-8);
+	std::memcpy(preamble + 3, ((const char*)pmt::blob_data(blob)) +8, data_len-8);
 
 	//************************ swap Acces Addr field **********************************
 	char tmp=0;

@@ -81,7 +81,7 @@ void preamble_prefixer_scapy_impl::make_frame (pmt::pmt_t msg)
 
         buf[5] = data_len-8;
 
-        std::memcpy(buf + 6, pmt::blob_data(blob)+8, data_len - 8);
+        std::memcpy(buf + 6, ((const char*)pmt::blob_data(blob))+8, data_len - 8);
 
         pmt::pmt_t packet = pmt::make_blob(buf, data_len + 6-8);
 
