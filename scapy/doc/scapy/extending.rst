@@ -4,14 +4,14 @@ Build your own tools
 
 You can use Scapy to make your own automated tools. You can also extend Scapy without having to edit its source file.
 
-If you have built some interesting tools, please contribute back to the mailing-list!
+If you have built some interesting tools, please contribute back to the github wiki !
 
     
 Using Scapy in your tools
 =========================
 You can easily use Scapy in your own tools. Just import what you need and do it.
 
-This first example take an IP or a name as first parameter, send an ICMP echo request packet and display the completely dissected return packet::
+This first example takes an IP or a name as first parameter, send an ICMP echo request packet and display the completely dissected return packet::
 
     #! /usr/bin/env python
     
@@ -22,7 +22,26 @@ This first example take an IP or a name as first parameter, send an ICMP echo re
     if p:
         p.show()
 
-This is a more complex example which does an ARP ping and reports what it found with LaTeX formating::
+Configuring Scapy's logger
+--------------------------
+
+Scapy configures a logger automatically using Python's ``logging`` module. This
+logger is custom to support things like colors and frequency filters. By
+default, it is set to ``WARNING`` (when not in interactive mode), but you can
+change that using for instance::
+
+    import logging
+    logging.getLogger("scapy").setLevel(logging.CRITICAL)
+
+To disable almost all logs. (Scapy simply won't work properly if a CRITICAL
+failure occurs)
+
+.. note:: On interactive mode, the default log level is ``INFO``
+
+More examples
+-------------
+
+This is a more complex example which does an ARP ping and reports what it found with LaTeX formatting::
 
     #! /usr/bin/env python
     # arping2tex : arpings a network and outputs a LaTeX table as a result
@@ -57,13 +76,13 @@ Here is another tool that will constantly monitor all interfaces on a machine an
     
     sniff(prn=arp_monitor_callback, filter="arp", store=0)
 
-For a real life example, you can check `Wifitap <http://sid.rstack.org/static/articles/w/i/f/Wifitap_EN_9613.html>`_.
+For a real life example, you can check `Wifitap <http://sid.rstack.org/static/articles/w/i/f/Wifitap_EN_9613.html>`_. Sadly, Wifitap is no longer maintained but nonetheless demonstrates Scapy's Wi-Fi capabilities. The code can be retrieved from `github <https://github.com/gdssecurity/wifitap/>`_.
 
 
 Extending Scapy with add-ons
 ============================
 
-If you need to add some new protocols, new functions, anything, you can write it directly into Scapy source file. But this is not very convenient. Even if those modifications are to be integrated into Scapy, it can be more convenient to write them in a separate file.
+If you need to add some new protocols, new functions, anything, you can write it directly into Scapy's source file. But this is not very convenient. Even if those modifications are to be integrated into Scapy, it can be more convenient to write them in a separate file.
 
 Once you've done that, you can launch Scapy and import your file, but this is still not very convenient. Another way to do that is to make your file executable and have it call the Scapy function named interact()::
 
@@ -71,7 +90,8 @@ Once you've done that, you can launch Scapy and import your file, but this is st
     
     # Set log level to benefit from Scapy warnings
     import logging
-    logging.getLogger("scapy").setLevel(1)
+    logger = logging.getLogger("scapy")
+    logger.setLevel(logging.INFO)
     
     from scapy.all import *
     

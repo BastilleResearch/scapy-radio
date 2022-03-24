@@ -22,7 +22,7 @@
 #ifndef INCLUDED_SCAPY_RADIO_ADD_GR_HEADER_IMPL_H
 #define INCLUDED_SCAPY_RADIO_ADD_GR_HEADER_IMPL_H
 
-#include <scapy_radio/add_gr_header.h>
+#include <gnuradio/scapy_radio/add_gr_header.h>
 
 namespace gr {
   namespace scapy_radio {

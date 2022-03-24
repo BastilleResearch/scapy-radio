@@ -12,25 +12,25 @@ What is ASN.1?
 
    This is only my view on ASN.1, explained as simply as possible. For more theoretical or academic views, I'm sure you'll find better on the Internet.
 
-ASN.1 is a notation whose goal is to specify formats for data exchange. It is independant of the way data is encoded. Data encoding is specified in Encoding Rules.
+ASN.1 is a notation whose goal is to specify formats for data exchange. It is independent of the way data is encoded. Data encoding is specified in Encoding Rules.
 
-The most used encoding rules are BER (Basic Encoding Rules) and DER (Distinguished Encoding Rules). Both look the same, but the latter is specified to guarantee uniqueness of encoding. This property is quite interesting when speaking about cryptography, hashes and signatures.
+The most used encoding rules are BER (Basic Encoding Rules) and DER (Distinguished Encoding Rules). Both look the same, but the latter is specified to guarantee uniqueness of encoding. This property is quite interesting when speaking about cryptography, hashes, and signatures.
 
-ASN.1 provides basic objects: integers, many kinds of strings, floats, booleans, containers, etc. They are grouped in the so called Universal class. A given protocol can provide other objects which will be grouped in the Context class. For example, SNMP defines PDU_GET or PDU_SET objects. There are also the Application and Private classes.
+ASN.1 provides basic objects: integers, many kinds of strings, floats, booleans, containers, etc. They are grouped in the so-called Universal class. A given protocol can provide other objects which will be grouped in the Context class. For example, SNMP defines PDU_GET or PDU_SET objects. There are also the Application and Private classes.
 
-Each of theses objects is given a tag that will be used by the encoding rules. Tags from 1 are used for Universal class. 1 is boolean, 2 is integer, 3 is a bit string, 6 is an OID, 48 is for a sequence. Tags from the ``Context`` class begin at 0xa0. When encountering an object tagged by 0xa0, we'll need to know the context to be able to decode it. For example, in SNMP context, 0xa0 is a PDU_GET object, while in X509 context, it is a container for the certificate version.
+Each of these objects is given a tag that will be used by the encoding rules. Tags from 1 are used for Universal class. 1 is boolean, 2 is an integer, 3 is a bit string, 6 is an OID, 48 is for a sequence. Tags from the ``Context`` class begin at 0xa0. When encountering an object tagged by 0xa0, we'll need to know the context to be able to decode it. For example, in SNMP context, 0xa0 is a PDU_GET object, while in X509 context, it is a container for the certificate version.
 
 Other objects are created by assembling all those basic brick objects. The composition is done using sequences and arrays (sets) of previously defined or existing objects. The final object (an X509 certificate, a SNMP packet) is a tree whose non-leaf nodes are sequences and sets objects (or derived context objects), and whose leaf nodes are integers, strings, OID, etc.
 
 Scapy and ASN.1
 ---------------
 
-Scapy provides a way to easily encode or decode ASN.1 and also program those encoders/decoders. It is quite more lax than what an ASN.1 parser should be, and it kind of ignores constraints. It won't replace neither an ASN.1 parser nor an ASN.1 compiler. Actually, it has been written to be able to encode and decode broken ASN.1. It can handle corrupted encoded strings and can also create those.
+Scapy provides a way to easily encode or decode ASN.1 and also program those encoders/decoders. It is quite laxer than what an ASN.1 parser should be, and it kind of ignores constraints. It won't replace neither an ASN.1 parser nor an ASN.1 compiler. Actually, it has been written to be able to encode and decode broken ASN.1. It can handle corrupted encoded strings and can also create those.
 
 ASN.1 engine
 ^^^^^^^^^^^^
 
-Note: many of the classes definitions presented here use metaclasses. If you don't look precisely at the source code and you only rely on my captures, you may think they sometimes exhibit a kind of magic behaviour.
+Note: many of the classes definitions presented here use metaclasses. If you don't look precisely at the source code and you only rely on my captures, you may think they sometimes exhibit a kind of magic behavior.
 ``
 Scapy ASN.1 engine provides classes to link objects and their tags. They inherit from the ``ASN1_Class``. The first one is ``ASN1_Class_UNIVERSAL``, which provide tags for most Universal objects. Each new context (``SNMP``, ``X509``) will inherit from it and add its own objects.
 
@@ -115,13 +115,13 @@ Encoding and decoding are done using class methods provided by the codec. For ex
     >>> BERcodec_Object.dec('\x03\x03egg')
     (<ASN1_BIT_STRING['egg']>, '')
 
-ASN.1 objects are encoded using their ``.enc()`` method. This method must be called with the codec we want to use. All codecs are referenced in the ASN1_Codecs object. ``str()`` can also be used. In this case, the default codec (``conf.ASN1_default_codec``) will be used.
+ASN.1 objects are encoded using their ``.enc()`` method. This method must be called with the codec we want to use. All codecs are referenced in the ASN1_Codecs object. ``raw()`` can also be used. In this case, the default codec (``conf.ASN1_default_codec``) will be used.
 
 ::
 
     >>> x.enc(ASN1_Codecs.BER)
     '0\r\x02\x01\x07\x04\x03egg0\x03\x01\x01\x00'
-    >>> str(x)
+    >>> raw(x)
     '0\r\x02\x01\x07\x04\x03egg0\x03\x01\x01\x00'
     >>> xx,remain = BERcodec_Object.dec(_)
     >>> xx.show()
@@ -397,7 +397,7 @@ Now, the hard part, the ASN.1 packet::
     bind_layers( UDP, SNMP, sport=161)
     bind_layers( UDP, SNMP, dport=161)
 
-That wasn't that much difficult. If you think that can't be that short to implement SNMP encoding/decoding and that I may may have cut too much, just look at the complete source code.
+That wasn't that much difficult. If you think that can't be that short to implement SNMP encoding/decoding and that I may have cut too much, just look at the complete source code.
 
 Now, how to use it? As usual::
 
@@ -426,7 +426,7 @@ Now, how to use it? As usual::
     >>> send(IP(dst="1.2.3.4")/UDP()/SNMP())
     .
     Sent 1 packets.
-    >>> SNMP(str(a)).show()
+    >>> SNMP(raw(a)).show()
     ###[ SNMP ]###
       version= <ASN1_INTEGER[3L]>
       community= <ASN1_STRING['public']>
@@ -493,9 +493,9 @@ It is even possible to graph it::
 Automata
 ========
 
-Scapy enables to create easily network automata. Scapy does not stick to a specific model like Moore or Mealy automata. It provides a flexible way for you to choose you way to go.
+Scapy enables to create easily network automata. Scapy does not stick to a specific model like Moore or Mealy automata. It provides a flexible way for you to choose your way to go.
 
-An automaton in Scapy is deterministic. It has different states. A start state and some end and error states. There are transitions from one state to another. Transitions can be transitions on a specific condition, transitions on the reception of a specific packet or transitions on a timeout. When a transition is taken, one or more actions can be run. An action can be bound to many transitions. Parameters can be passed from states to transitions and from transitions to states and actions.
+An automaton in Scapy is deterministic. It has different states. A start state and some end and error states. There are transitions from one state to another. Transitions can be transitions on a specific condition, transitions on the reception of a specific packet or transitions on a timeout. When a transition is taken, one or more actions can be run. An action can be bound to many transitions. Parameters can be passed from states to transitions, and from transitions to states and actions.
 
 From a programmer's point of view, states, transitions and actions are methods from an Automaton subclass. They are decorated to provide meta-information needed in order for the automaton to work.
 
@@ -527,7 +527,7 @@ Let's begin with a simple example. I take the convention to write states with ca
 In this example, we can see 3 decorators:
 
 * ``ATMT.state`` that is used to indicate that a method is a state, and that can
-  have initial, final and error optional arguments set to non-zero for special states.
+  have initial, final, stop and error optional arguments set to non-zero for special states.
 * ``ATMT.condition`` that indicate a method to be run when the automaton state 
   reaches the indicated state. The argument is the name of the method representing that state
 * ``ATMT.action`` binds a method to a transition and is run when the transition is taken. 
@@ -609,7 +609,7 @@ Here is a real example take from Scapy. It implements a TFTP client that can iss
             self.my_tid = self.sport or RandShort()._fix()
             bind_bottom_up(UDP, TFTP, dport=self.my_tid)
             self.server_tid = None
-            self.res = ""
+            self.res = b""
     
             self.l3 = IP(dst=self.server)/UDP(sport=self.my_tid, dport=self.port)/TFTP()
             self.last_packet = self.l3/TFTP_RRQ(filename=self.filename, mode="octet")
@@ -681,7 +681,9 @@ Decorators
 Decorator for states
 ~~~~~~~~~~~~~~~~~~~~
 
-States are methods decorated by the result of the ``ATMT.state`` function. It can take 3 optional parameters, ``initial``, ``final`` and ``error``, that, when set to ``True``, indicate that the state is an initial, final or error state.
+States are methods decorated by the result of the ``ATMT.state`` function. It can take 4 optional parameters, ``initial``, ``final``, ``stop`` and ``error``, that, when set to ``True``, indicating that the state is an initial, final, stop or error state.
+
+.. note:: The ``initial`` state is called while starting the automata. The ``final`` step will tell the automata has reached its end. If you call ``atmt.stop()``, the automata will move to the ``stop`` step whatever its current state is. The ``error`` state will mark the automata as errored. If no ``stop`` state is specified, calling ``stop`` and ``forcestop`` will be equivalent.
 
 ::
 
@@ -689,24 +691,39 @@ States are methods decorated by the result of the ``ATMT.state`` function. It ca
         @ATMT.state(initial=1)
         def BEGIN(self):
             pass
-    
+
         @ATMT.state()
         def SOME_STATE(self):
             pass
-    
+
         @ATMT.state(final=1)
         def END(self):
             return "Result of the automaton: 42"
-    
+
+        @ATMT.state(stop=1)
+        def STOP(self):
+            print("SHUTTING DOWN...")
+            # e.g. close sockets...
+
+        @ATMT.condition(STOP)
+        def is_stopping(self):
+            raise self.END()
+
         @ATMT.state(error=1)
         def ERROR(self):
             return "Partial result, or explanation"
     # [...]
 
+Take for instance the TCP client:
+
+.. image:: graphics/ATMT_TCP_client.svg
+
+The ``START`` event is ``initial=1``, the ``STOP`` event is ``stop=1`` and the ``CLOSED`` event is ``final=1``.
+
 Decorators for transitions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Transitions are methods decorated by the result of one of ``ATMT.condition``, ``ATMT.receive_condition``, ``ATMT.timeout``. They all take as argument the state method they are related to. ``ATMT.timeout`` also have a mandatory ``timeout`` parameter to provide the timeout value in seconds. ``ATMT.condition`` and ``ATMT.receive_condition`` have an optional ``prio`` parameter so that the order in which conditions are evaluated can be forced. Default priority is 0. Transitions with the same priority level are called in an undetermined order.
+Transitions are methods decorated by the result of one of ``ATMT.condition``, ``ATMT.receive_condition``, ``ATMT.timeout``. They all take as argument the state method they are related to. ``ATMT.timeout`` also have a mandatory ``timeout`` parameter to provide the timeout value in seconds. ``ATMT.condition`` and ``ATMT.receive_condition`` have an optional ``prio`` parameter so that the order in which conditions are evaluated can be forced. The default priority is 0. Transitions with the same priority level are called in an undetermined order.
 
 When the automaton switches to a given state, the state's method is executed. Then transitions methods are called at specific moments until one triggers a new state (something like ``raise self.MY_NEW_STATE()``). First, right after the state's method returns, the ``ATMT.condition`` decorated methods are run by growing prio. Then each time a packet is received and accepted by the master filter all ``ATMT.receive_condition`` decorated hods are called by growing prio. When a timeout is reached since the time we entered into the current space, the corresponding ``ATMT.timeout`` decorated method is called.
 
@@ -739,7 +756,7 @@ When the automaton switches to a given state, the state's method is executed. Th
 Decorator for actions
 ~~~~~~~~~~~~~~~~~~~~~
 
-Actions are methods that are decorated by the return of ``ATMT.action`` function. This function takes the transition method it is bound to as first parameter and an optionnal priority ``prio`` as a second parameter. Default priority is 0. An action method can be decorated many times to be bound to many transitions.
+Actions are methods that are decorated by the return of ``ATMT.action`` function. This function takes the transition method it is bound to as first parameter and an optional priority ``prio`` as a second parameter. The default priority is 0. An action method can be decorated many times to be bound to many transitions.
 
 ::
 
@@ -756,6 +773,7 @@ Actions are methods that are decorated by the return of ``ATMT.action`` function
         def maybe_go_to_end(self):
             if random() > 0.5:
                 raise self.END()
+
         @ATMT.condition(BEGIN, prio=2)
         def certainly_go_to_end(self):
             raise self.END()
@@ -763,9 +781,11 @@ Actions are methods that are decorated by the return of ``ATMT.action`` function
         @ATMT.action(maybe_go_to_end)
         def maybe_action(self):
             print "We are lucky..."
+
         @ATMT.action(certainly_go_to_end)
         def certainly_action(self):
             print "We are not lucky..."
+
         @ATMT.action(maybe_go_to_end, prio=1)
         @ATMT.action(certainly_go_to_end, prio=1)
         def always_action(self):
@@ -781,12 +801,383 @@ The two possible outputs are::
     We are lucky...
     This wasn't luck!...
 
+
+.. note:: If you want to pass a parameter to an action, you can use the ``action_parameters`` function while raising the next state.
+
+In the following example, the ``send_copy`` action takes a parameter passed by ``is_fin``::
+
+    class Example(Automaton):
+        @ATMT.state()
+        def WAITING(self):
+            pass
+
+        @ATMT.state()
+        def FIN_RECEIVED(self):
+            pass
+
+        @ATMT.receive_condition(WAITING)
+        def is_fin(self, pkt):
+            if pkt[TCP].flags.F:
+                raise self.FIN_RECEIVED().action_parameters(pkt)
+
+        @ATMT.action(is_fin)
+        def send_copy(self, pkt):
+            send(pkt)
+
+
 Methods to overload
 ^^^^^^^^^^^^^^^^^^^
 
 Two methods are hooks to be overloaded:
 
-* The ``parse_args()`` method is called with arguments given at ``__init__()`` and ``run()``. Use that to parametrize the behaviour of your automaton.
+* The ``parse_args()`` method is called with arguments given at ``__init__()`` and ``run()``. Use that to parametrize the behavior of your automaton.
 
 * The ``master_filter()`` method is called each time a packet is sniffed and decides if it is interesting for the automaton. When working on a specific protocol, this is where you will ensure the packet belongs to the connection you are being part of, so that you do not need to make all the sanity checks in each transition.
 
+.. _pipetools:
+
+PipeTools
+=========
+
+Scapy's ``pipetool`` is a smart piping system allowing to perform complex stream data management.
+
+The goal is to create a sequence of steps with one or several inputs and one or several outputs, with a bunch of blocks in between.
+PipeTools can handle varied sources of data (and outputs) such as user input, pcap input, sniffing, wireshark...
+A pipe system is implemented by manually linking all its parts. It is possible to dynamically add an element while running or set multiple drains for the same source.
+
+.. note:: Pipetool default objects are located inside ``scapy.pipetool``
+
+Demo: sniff, anonymize, send to Wireshark
+-----------------------------------------
+
+The following code will sniff packets on the default interface, anonymize the source and destination IP addresses and pipe it all into Wireshark. Useful when posting online examples, for instance.
+
+.. code-block:: python3
+
+    source = SniffSource(iface=conf.iface)
+    wire = WiresharkSink()
+    def transf(pkt):
+        if not pkt or IP not in pkt:
+            return pkt
+        pkt[IP].src = "1.1.1.1"
+        pkt[IP].dst = "2.2.2.2"
+        return pkt
+
+    source > TransformDrain(transf) > wire
+    p = PipeEngine(source)
+    p.start()
+    p.wait_and_stop()
+
+The engine is pretty straightforward:
+
+.. image:: graphics/pipetool_demo.svg
+
+Let's run it:
+
+.. image:: https://scapy.net/files/doc/pipetool_demo.gif
+
+Class Types
+-----------
+
+There are 3 different class of objects used for data management:
+
+- ``Sources``
+- ``Drains``
+- ``Sinks``
+
+They are executed and handled by a :class:`~scapy.pipetool.PipeEngine` object.
+
+When running, a pipetool engine waits for any available data from the Source, and send it in the Drains linked to it.
+The data then goes from Drains to Drains until it arrives in a Sink, the final state of this data.
+
+Let's see with a basic demo how to build a pipetool system.
+
+.. image:: graphics/pipetool_engine.png
+
+For instance, this engine was generated with this code:
+
+.. code:: pycon
+
+    >>> s = CLIFeeder()
+    >>> s2 = CLIHighFeeder()
+    >>> d1 = Drain()
+    >>> d2 = TransformDrain(lambda x: x[::-1])
+    >>> si1 = ConsoleSink()
+    >>> si2 = QueueSink()
+    >>> 
+    >>> s > d1
+    >>> d1 > si1
+    >>> d1 > si2
+    >>> 
+    >>> s2 >> d1
+    >>> d1 >> d2
+    >>> d2 >> si1
+    >>> 
+    >>> p = PipeEngine()
+    >>> p.add(s)
+    >>> p.add(s2)
+    >>> p.graph(target="> the_above_image.png")
+
+``start()`` is used to start the :class:`~scapy.pipetool.PipeEngine`:
+
+.. code:: pycon
+
+    >>> p.start()
+
+Now, let's play with it by sending some input data
+
+.. code:: pycon
+
+    >>> s.send("foo")
+    >'foo'
+    >>> s2.send("bar")
+    >>'rab'
+    >>> s.send("i like potato")
+    >'i like potato'
+    >>> print(si2.recv(), ":", si2.recv())
+    foo : i like potato
+
+Let's study what happens here:
+
+- there are **two canals** in a :class:`~scapy.pipetool.PipeEngine`, a lower one and a higher one. Some Sources write on the lower one, some on the higher one and some on both.
+- most sources can be linked to any drain, on both lower and higher canals. The use of ``>`` indicates a link on the low canal, and ``>>`` on the higher one.
+- when we send some data in ``s``, which is on the lower canal, as shown above, it goes through the :class:`~scapy.pipetool.Drain` then is sent to the :class:`~.scapy.pipetool.QueueSink` and to the :class:`~scapy.pipetool.ConsoleSink`
+- when we send some data in ``s2``, it goes through the Drain, then the TransformDrain where the data is reversed (see the lambda), before being sent to :class:`~scapy.pipetool.ConsoleSink` only. This explains why we only have the data of the lower sources inside the QueueSink: the higher one has not been linked.
+
+Most of the sinks receive from both lower and upper canals. This is verifiable using the `help(ConsoleSink)`
+
+.. code:: pycon
+
+    >>> help(ConsoleSink)
+    Help on class ConsoleSink in module scapy.pipetool:
+    class ConsoleSink(Sink)
+     |  Print messages on low and high entries
+     |     +-------+
+     |  >>-|--.    |->>
+     |     | print |
+     |   >-|--'    |->
+     |     +-------+
+     |
+     [...]
+
+
+Sources
+^^^^^^^
+
+A Source is a class that generates some data.
+
+There are several source types integrated with Scapy, usable as-is, but you may
+also create yours.
+
+Default Source classes
+~~~~~~~~~~~~~~~~~~~~~~
+
+For any of those class, have a look at ``help([theclass])`` to get more information or the required parameters.
+
+- :class:`~scapy.pipetool.CLIFeeder` : a source especially used in interactive software. its ``send(data)`` generates the event data on the lower canal
+- :class:`~scapy.pipetool.CLIHighFeeder` : same than CLIFeeder, but writes on the higher canal
+- :class:`~scapy.pipetool.PeriodicSource` : Generate messages periodically on the low canal.
+- :class:`~scapy.pipetool.AutoSource`: the default source, that must be extended to create custom sources. 
+
+Create a custom Source
+~~~~~~~~~~~~~~~~~~~~~~
+
+To create a custom source, one must extend the :class:`~scapy.pipetool.AutoSource` class.
+
+.. note::
+
+    Do NOT use the default :class:`~scapy.pipetool.Source` class except if you are really sure of what you are doing: it is only used internally, and is missing some implementation. The :class:`~scapy.pipetool.AutoSource` is made to be used.
+
+
+To send data through it, the object must call its ``self._gen_data(msg)`` or ``self._gen_high_data(msg)`` functions, which send the data into the PipeEngine.
+
+The Source should also (if possible), set ``self.is_exhausted`` to ``True`` when empty, to allow the clean stop of the :class:`~scapy.pipetool.PipeEngine`. If the source is infinite, it will need a force-stop (see PipeEngine below)
+
+For instance, here is how :class:`~scapy.pipetool.CLIHighFeeder` is implemented:
+
+.. code:: python3
+
+    class CLIFeeder(CLIFeeder):
+        def send(self, msg):
+            self._gen_high_data(msg)
+        def close(self):
+            self.is_exhausted = True
+
+Drains
+^^^^^^
+
+Default Drain classes
+~~~~~~~~~~~~~~~~~~~~~
+
+Drains need to be linked on the entry that you are using. It can be either on the lower one (using ``>``) or the upper one (using ``>>``).
+See the basic example above.
+
+- :class:`~scapy.pipetool.Drain` : the most basic Drain possible. Will pass on both low and high entry if linked properly.
+- :class:`~scapy.pipetool.TransformDrain` : Apply a function to messages on low and high entry
+- :class:`~scapy.pipetool.UpDrain` : Repeat messages from low entry to high exit
+- :class:`~scapy.pipetool.DownDrain` : Repeat messages from high entry to low exit
+
+Create a custom Drain
+~~~~~~~~~~~~~~~~~~~~~
+
+To create a custom drain, one must extend the :class:`~scapy.pipetool.Drain` class.
+
+A :class:`~scapy.pipetool.Drain` object will receive data from the lower canal in its ``push`` method, and from the higher canal from its ``high_push`` method.
+
+To send the data back into the next linked Drain / Sink, it must call the ``self._send(msg)`` or ``self._high_send(msg)`` methods.
+
+For instance, here is how :class:`~scapy.pipetool.TransformDrain` is implemented::
+
+    class TransformDrain(Drain):
+        def __init__(self, f, name=None):
+            Drain.__init__(self, name=name)
+            self.f = f
+        def push(self, msg):
+            self._send(self.f(msg))
+        def high_push(self, msg):
+            self._high_send(self.f(msg))
+
+Sinks
+^^^^^
+
+Sinks are destinations for messages.
+
+A :py:class:`~scapy.pipetool.Sink` receives data like a :py:class:`~scapy.pipetool.Drain`, but doesn't send any
+messages after it.
+
+Messages on the low entry come from :py:meth:`~scapy.pipetool.Sink.push`, and messages on the
+high entry come from :py:meth:`~scapy.pipetool.Sink.high_push`.
+
+Default Sinks classes
+~~~~~~~~~~~~~~~~~~~~~
+
+- :class:`~scapy.pipetool.ConsoleSink` : Print messages on low and high entries to ``stdout``
+- :class:`~scapy.pipetool.RawConsoleSink` : Print messages on low and high entries, using os.write
+- :class:`~scapy.pipetool.TermSink` : Prints messages on the low and high entries, on a separate terminal
+- :class:`~scapy.pipetool.QueueSink` : Collects messages on the low and high entries into a :py:class:`Queue`
+
+Create a custom Sink
+~~~~~~~~~~~~~~~~~~~~
+
+To create a custom sink, one must extend :py:class:`~scapy.pipetool.Sink` and implement
+:py:meth:`~scapy.pipetool.Sink.push` and/or :py:meth:`~scapy.pipetool.Sink.high_push`.
+
+This is a simplified version of :py:class:`~scapy.pipetool.ConsoleSink`:
+
+.. code-block:: python3
+
+    class ConsoleSink(Sink):
+        def push(self, msg):
+            print(">%r" % msg)
+        def high_push(self, msg):
+            print(">>%r" % msg)
+
+Link objects
+------------
+
+As shown in the example, most sources can be linked to any drain, on both low
+and high entry.
+
+The use of ``>`` indicates a link on the low entry, and ``>>`` on the high
+entry.
+
+For example, to link ``a``, ``b`` and ``c`` on the low entries:
+
+.. code-block:: pycon
+
+    >>> a = CLIFeeder()
+    >>> b = Drain()
+    >>> c = ConsoleSink()
+    >>> a > b > c
+    >>> p = PipeEngine()
+    >>> p.add(a)
+
+This wouldn't link the high entries, so something like this would do nothing:
+
+.. code-block:: pycon
+
+    >>> a2 = CLIHighFeeder()
+    >>> a2 >> b
+    >>> a2.send("hello")
+
+Because ``b`` (:py:class:`~scapy.pipetool.Drain`) and ``c`` (:py:class:`scapy.pipetool.ConsoleSink`) are not
+linked on the high entry.
+
+However, using a :py:class:`~scapy.pipetool.DownDrain` would bring the high messages from
+:py:class:`~scapy.pipetool.CLIHighFeeder` to the lower channel:
+
+.. code-block:: pycon
+
+    >>> a2 = CLIHighFeeder()
+    >>> b2 = DownDrain()
+    >>> a2 >> b2
+    >>> b2 > b
+    >>> a2.send("hello")
+
+The PipeEngine class
+--------------------
+
+The :class:`~scapy.pipetool.PipeEngine` class is the core class of the Pipetool system. It must be initialized and passed the list of all Sources.
+
+There are two ways of passing sources:
+
+- during initialization: ``p = PipeEngine(source1, source2, ...)``
+- using the ``add(source)`` method
+
+A :class:`~scapy.pipetool.PipeEngine` class must be started with ``.start()`` function. It may be force-stopped with the ``.stop()``, or cleanly stopped with ``.wait_and_stop()``
+
+A clean stop only works if the Sources is exhausted (has no data to send left).
+
+It can be printed into a graph using ``.graph()`` methods. see ``help(do_graph)`` for the list of available keyword arguments.
+
+Scapy advanced PipeTool objects
+-------------------------------
+
+.. note:: Unlike the previous objects, those are not located in ``scapy.pipetool`` but in ``scapy.scapypipes``
+
+Now that you know the default PipeTool objects, here are some more advanced ones, based on packet functionalities.
+
+- :class:`~scapy.scapypipes.SniffSource` : Read packets from an interface and send them to low exit.
+- :class:`~scapy.scapypipes.RdpcapSource` : Read packets from a PCAP file send them to low exit.
+- :class:`~scapy.scapypipes.InjectSink` : Packets received on low input are injected (sent) to an interface
+- :class:`~scapy.scapypipes.WrpcapSink` : Packets received on low input are written to PCAP file
+- :class:`~scapy.scapypipes.UDPDrain` : UDP payloads received on high entry are sent over UDP (complicated, have a look at ``help(UDPDrain)``)
+- :class:`~scapy.scapypipes.FDSourceSink` : Use a file descriptor as source and sink
+- :class:`~scapy.scapypipes.TCPConnectPipe`: TCP connect to addr:port and use it as source and sink
+- :class:`~scapy.scapypipes.TCPListenPipe` : TCP listen on [addr:]port and use the first connection as source and sink (complicated, have a look at ``help(TCPListenPipe)``)
+
+Triggering
+----------
+
+Some special sort of Drains exists: the Trigger Drains.
+
+Trigger Drains are special drains, that on receiving data not only pass it by but also send a "Trigger" input, that is received and handled by the next triggered drain (if it exists).
+
+For example, here is a basic :class:`~scapy.scapypipes.TriggerDrain` usage:
+
+.. code:: pycon
+
+    >>> a = CLIFeeder()
+    >>> d = TriggerDrain(lambda msg: True) # Pass messages and trigger when a condition is met
+    >>> d2 = TriggeredValve()
+    >>> s = ConsoleSink()
+    >>> a > d > d2 > s
+    >>> d ^ d2 # Link the triggers
+    >>> p = PipeEngine(s)
+    >>> p.start()
+    INFO: Pipe engine thread started.
+    >>> 
+    >>> a.send("this will be printed")
+    >'this will be printed'
+    >>> a.send("this won't, because the valve was switched")
+    >>> a.send("this will, because the valve was switched again")
+    >'this will, because the valve was switched again'
+    >>> p.stop()
+
+Several triggering Drains exist, they are pretty explicit. It is highly recommended to check the doc using ``help([the class])``
+
+- :class:`~scapy.scapypipes.TriggeredMessage` : Send a preloaded message when triggered and trigger in chain
+- :class:`~scapy.scapypipes.TriggerDrain` : Pass messages and trigger when a condition is met
+- :class:`~scapy.scapypipes.TriggeredValve` : Let messages alternatively pass or not, changing on trigger
+- :class:`~scapy.scapypipes.TriggeredQueueingValve` : Let messages alternatively pass or queued, changing on trigger
+- :class:`~scapy.scapypipes.TriggeredSwitch` : Let messages alternatively high or low, changing on trigger

@@ -22,7 +22,7 @@
 #ifndef INCLUDED_ZIGBEE_PREAMBLE_PREFIXER_SCAPY_IMPL_H
 #define INCLUDED_ZIGBEE_PREAMBLE_PREFIXER_SCAPY_IMPL_H
 
-#include <zigbee/preamble_prefixer_scapy.h>
+#include <gnuradio/zigbee/preamble_prefixer_scapy.h>
 
 namespace gr {
   namespace zigbee {

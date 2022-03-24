@@ -68,7 +68,7 @@ preamble_prefixer_impl::preamble_prefixer_impl()
     //Queue stuff
     message_port_register_out(pmt::mp("out"));
     message_port_register_in(pmt::mp("in"));
-    set_msg_handler(pmt::mp("in"), boost::bind(&preamble_prefixer_impl::make_frame, this, _1));
+    set_msg_handler(pmt::mp("in"), [this](pmt::pmt_t msg) { this->make_frame(msg); });
 
 }
 

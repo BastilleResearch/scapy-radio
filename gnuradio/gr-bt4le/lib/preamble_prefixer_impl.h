@@ -22,7 +22,7 @@
 #ifndef INCLUDED_BT4LE_PREAMBLE_PREFIXER_IMPL_H
 #define INCLUDED_BT4LE_PREAMBLE_PREFIXER_IMPL_H
 
-#include <bt4le/preamble_prefixer.h>
+#include <gnuradio/bt4le/preamble_prefixer.h>
 
 namespace gr {
   namespace bt4le {

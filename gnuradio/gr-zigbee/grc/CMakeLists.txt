@@ -18,6 +18,6 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
-    zigbee_packet_sink_scapy.xml
-    zigbee_preamble_prefixer_scapy.xml DESTINATION share/gnuradio/grc/blocks
+    zigbee_packet_sink_scapy.block.yml
+    zigbee_preamble_prefixer_scapy.block.yml DESTINATION share/gnuradio/grc/blocks
 )

@@ -5,28 +5,74 @@ Scapy development
 Project organization
 ====================
 
-Scapy development uses the Mercurial version control system.
-Scapy's reference repository is at http://hg.secdev.org/scapy/. 
+Scapy development uses the Git version control system. Scapy's
+reference repository is at https://github.com/secdev/scapy/.
 
-Project management is done with `Trac <http://trac.secdev.org/scapy>`_. Trac works on Scapy's reference repository.
-It provides a freely editable `Wiki <http://trac.secdev.org/scapy/wiki/>`_ (please contribute!) that can 
-reference tickets, changesets, files from the project. It also provides 
-a ticket management service that is used to avoid forgetting patches or bugs.
-
-Mercurial's distributed way of working enables Philippe to provide two repositories
-where anybody can commit stuff: 
-the Scapy `community repository <http://hg.secdev.org/scapy-com>`_ and the Scapy `Windows port repository <http://hg.secdev.org/scapy-com>`_. 
-
+Project management is done with `Github
+<https://github.com/secdev/scapy/>`_.  It provides a freely editable
+`Wiki <https://github.com/secdev/scapy/wiki/>`_ (please contribute!)
+that can reference tickets, changesets, files from the project. It
+also provides a ticket management service that is used to avoid
+forgetting patches or bugs.
 
 How to contribute
 =================
 
-* Found a bug in Scapy? `Add a ticket <http://trac.secdev.org/scapy/newticket>`_.
+* Found a bug in Scapy? `Add a ticket <https://github.com/secdev/scapy/issues/new>`_.
 * Improve this documentation.
-* Program a new layer and share it on the mailing list. Or add it as an enhancement on the bugtracker. 
-* Contribute new `regression tests <http://trac.secdev.org/scapy/wiki/RegressionTests>`_.
-* Upload packet samples for new protocols on the `packet samples page <http://trac.secdev.org/scapy/wiki/PacketsSamples>`_.
+* Program a new layer and share it on the mailing list, or create a pull request.
+* Contribute new `regression tests <https://github.com/secdev/scapy/wiki/Contrib:-RegressionTests>`_.
+* Upload packet samples for new protocols on the `packet samples page
+  <https://github.com/secdev/scapy/wiki/Contrib:-PacketSamples>`_.
 
+
+Improve the documentation
+=========================
+
+The documentation can be improved in several ways by:
+
+* Adding docstrings to the source code.
+* Adding usage examples to the documentation.
+
+Adding Docstrings
+-----------------
+The Scapy source code has few explanations of what a function is doing. A docstring, by adding explanation and
+expected input and output parameters, helps saving time for both the layer developers and the users looking for
+advanced features.
+
+An example of docstring from the ``scapy.fields.FlagsField`` class: ::
+
+  class FlagsField(BitField):
+    """ Handle Flag type field
+
+     Make sure all your flags have a label
+
+     Example:
+         >>> from scapy.packet import Packet
+         >>> class FlagsTest(Packet):
+                 fields_desc = [FlagsField("flags", 0, 8, ["f0", "f1", "f2", "f3", "f4", "f5", "f6", "f7"])]
+         >>> FlagsTest(flags=9).show2()
+         ###[ FlagsTest ]###
+           flags     = f0+f3
+         >>> FlagsTest(flags=0).show2().strip()
+         ###[ FlagsTest ]###
+           flags     =
+
+     :param name: field's name
+     :param default: default value for the field
+     :param size: number of bits in the field
+     :param names: (list or dict) label for each flag, Least Significant Bit tag's name is written first
+     """
+
+It will contain a short one-line description of the class followed by some indications about its usage.
+You can add a usage example if it makes sense using the `doctest <https://docs.python.org/2.7/library/doctest.html>`_ format.
+Finally, the classic python signature can be added following the `sphinx documentation  <http://www.sphinx-doc.org/en/stable/domains.html#python-signatures>`_.
+
+This task works in pair with writing non regression unit tests.
+
+Documentation
+-------------
+A way to improve the documentation content is by keeping it up to date with the latest version of Scapy. You can also help by adding usage examples of your own or directly gathered from existing online Scapy presentations.
 
 Testing with UTScapy
 ====================
@@ -36,7 +82,7 @@ What is UTScapy?
 
 UTScapy is a small Python program that reads a campaign of tests, runs the campaign with Scapy and generates a report indicating test status. The report may be in one of four formats, text, ansi, HTML or LaTeX.
 
-Three basic test containers exist with UTScapy, a unit test, a test set and a test campaign. A unit test is a list of Scapy commands that will be run by Scapy or a derived work of Scapy. Evaluation of the last command in the unit test will determine the end result of the individual unit test. A test set is a group of unit tests with some association. A test campaign consists of one or more test sets. Test sets and unit tests can be given keywords to form logical groupings. When running a campaign, tests may be selected by keyword. This allows the user to run tests within a desired grouping.
+Three basic test containers exist with UTScapy, a unit test, a test set and a test campaign. A unit test is a list of Scapy commands that will be run by Scapy or a derived work of Scapy. Evaluation of the last command in the unit test will determine the end result of the individual unit test. A test set is a group of unit tests with some association. A test campaign consists of one or more test sets. Test sets and unit tests can be given keywords to form logical groupings. When running a campaign, tests may be selected by keyword. This allows the user to run tests within the desired grouping.
 
 For each unit test, test set and campaign, a CRC32 of the test is calculated and displayed as a signature of that test. This test signature is sufficient to determine that the actual test run was the one expected and not one that has been modified. In case your dealing with evil people that try to modify or corrupt the file without changing the CRC32, a global SHA1 is computed on the whole file.
 
@@ -58,7 +104,7 @@ Syntax Specifier   Definition
 
 Table 1 - UTScapy Syntax Specifiers
 
-Comments placed in the test report have a context. Each comment will be associated to the last defined test container - be it a individual unit test, a test set or a test campaign. Multiple comments associated with a particular container will be concatenated together and will appear in the report directly after the test container announcement. General comments for a test file should appear before announcing a test campaign. For comments to be associated with a test campaign, they must appear after declaration of the test campaign but before any test set or unit test. Comments for a test set should appear before definition of the set’s first unit test.
+Comments placed in the test report have a context. Each comment will be associated with the last defined test container - be it an individual unit test, a test set or a test campaign. Multiple comments associated with a particular container will be concatenated together and will appear in the report directly after the test container announcement. General comments for a test file should appear before announcing a test campaign. For comments to be associated with a test campaign, they must appear after the declaration of the test campaign but before any test set or unit test. Comments for a test set should appear before the definition of the set’s first unit test.
 
 The generic format for a test campaign is shown in the following table::
 
@@ -78,7 +124,7 @@ The generic format for a test campaign is shown in the following table::
     a == 1
 
 
-Python statements are identified by the lack of a defined UTScapy syntax specifier. The Python statements are fed directly to the Python interpreter as if one is operating within the interactive Scapy shell (``interact``). Looping, iteration and conditionals are permissible but must be terminated by a blank line. A test set may be comprised of multiple unit tests and multiple test sets may be defined for each campaign. It is even possible to have multiple test campaigns in a particular test definition file. The use of keywords allows testing of subsets of the entire campaign. For example, during development of a test campaign, the user may wish to mark new tests under development with the keyword “debug”. Once the tests run successfully to their desired conclusion, the keyword “debug” could be removed. Keywords such as “regression” or “limited” could be used as well.
+Python statements are identified by the lack of a defined UTScapy syntax specifier. The Python statements are fed directly to the Python interpreter as if one is operating within the interactive Scapy shell (``interact``). Looping, iteration and conditionals are permissible but must be terminated by a blank line. A test set may be comprised of multiple unit tests and multiple test sets may be defined for each campaign. It is even possible to have multiple test campaigns in a particular test definition file. The use of keywords allows testing of subsets of the entire campaign. For example, during the development of a test campaign, the user may wish to mark new tests under development with the keyword “debug”. Once the tests run successfully to their desired conclusion, the keyword “debug” could be removed. Keywords such as “regression” or “limited” could be used as well.
 
 It is important to note that UTScapy uses the truth value from the last Python statement as the indicator as to whether a test passed or failed. Multiple logical tests may appear on the last line. If the result is 0 or False, the test fails. Otherwise, the test passes. Use of an assert() statement can force evaluation of intermediate values if needed.
 
@@ -130,7 +176,7 @@ Argument    Argument Value  Meaning to UTScapy
 
 Table 4 - UTScapy parameters
 
-Table 5 shows a simple test campaign with multiple test set definitions. Additionally, keywords are specified that allow a limited number of test cases to be executed. Notice the use of the ``assert()`` statement in test 3 and 5 used to check intermediate results. Tests 2 and 5 will fail by design.
+Table 5 shows a simple test campaign with multiple tests set definitions. Additionally, keywords are specified that allow a limited number of test cases to be executed. Notice the use of the ``assert()`` statement in test 3 and 5 used to check intermediate results. Tests 2 and 5 will fail by design.
 
 :: 
 
@@ -193,6 +239,71 @@ Table 5 shows a simple test campaign with multiple test set definitions. Additio
 
 To see an example that is targeted to Scapy, go to http://www.secdev.org/projects/UTscapy. Cut and paste the example at the bottom of the page to the file ``demo_campaign.txt`` and run UTScapy against it::
 
-./UTscapy.py -t demo_campaign.txt -f html -o demo_campaign.html –F -l
+./test/run_tests -t demo_campaign.txt -f html -o demo_campaign.html -F -l
 
 Examine the output generated in file ``demo_campaign.html``.
+
+Using tox to test Scapy
+-----------------------
+
+The ``tox`` command simplifies testing Scapy. It will automatically create
+virtual environments and install the mandatory Python modules.
+
+For example, on a fresh Debian installation, the following command will start
+all Scapy unit tests automatically without any external dependency::
+
+ tox -- -K vcan_socket -K tcpdump -K tshark -K nmap -K manufdb -K crypto
+
+.. note:: This will trigger the unit tests on all available Python versions
+  unless you specify a `-e` option. See below
+
+For your convenience, and for package maintainers, we provide a util that
+run tox on only a single (default Python) environment, again with no external
+dependencies::
+
+ ./test/run_tests
+
+VIM syntax highlighting for .uts files
+--------------------------------------
+
+Copy all files from ``scapy/doc/syntax/vim_uts_syntax/ftdetect`` and ``scapy/doc/syntax/vim_uts_syntax/syntax`` into ``~/.vim/`` and preserve the folder structure.
+
+If ftdetect/filetype.vim already exists, you might need to modify this file manually.
+
+These commands will do the installation::
+
+ cp -i -v ftdetect/filetype.vim $HOME/.vim/ftdetect/filetype.vim
+ cp -i -v ftdetect/uts.vim $HOME/.vim/ftdetect/uts.vim
+ cp -i -v syntax/uts.vim $HOME/.vim/syntax/uts.vim
+
+Alternatively, a install script in ``scapy/doc/syntax/vim_uts_syntax/`` does the installation automatically.
+
+
+Releasing Scapy
+===============
+
+Under the hood, a Scapy release is represented as a signed git tag. Prior to
+signing a commit, the maintainer that wishes to create a release must:
+
+* check that the corresponding Travis and AppVeyor tests pass
+* run ``./run_scapy`` locally
+* run ``tox``
+* run unit tests on BSD using the Vagrant setup from ``scapy/doc/vagrant_ci/``
+
+Taking v2.4.3 as an example, the following commands can be used to sign and
+publish the release::
+
+ git tag -s v2.4.3 -m "Release 2.4.3"
+ git tag v2.4.3 -v
+ git push --tags
+
+Release Candidates (RC) could also be done. For example, the first RC will be
+tagged v2.4.3rc1 and the message ``2.4.3 Release Candidate #1``.
+
+Prior to uploading the release to PyPi, the ``author_email`` in ``setup.py``
+must be changed to the address of the maintainer performing the release. The
+following commands can then be used::
+
+ python3 setup.py sdist
+ twine check dist/scapy-2.4.3.tar.gz
+ twine upload dist/scapy-2.4.3.tar.gz

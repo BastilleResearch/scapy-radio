@@ -21,7 +21,7 @@
 
 
 from scapy.main import interact
-from scapy import main
+import scapy.main as main
 
 main.load_module('gnuradio')
 interact()

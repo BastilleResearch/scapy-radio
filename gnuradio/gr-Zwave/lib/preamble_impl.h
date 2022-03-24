@@ -22,7 +22,7 @@
 #ifndef INCLUDED_ZWAVE_PREAMBLE_IMPL_H
 #define INCLUDED_ZWAVE_PREAMBLE_IMPL_H
 
-#include <Zwave/preamble.h>
+#include <gnuradio/Zwave/preamble.h>
 
 namespace gr {
   namespace Zwave {

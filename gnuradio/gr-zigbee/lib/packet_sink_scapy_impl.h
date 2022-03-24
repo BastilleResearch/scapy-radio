@@ -22,7 +22,7 @@
 #ifndef INCLUDED_ZIGBEE_PACKET_SINK_SCAPY_IMPL_H
 #define INCLUDED_ZIGBEE_PACKET_SINK_SCAPY_IMPL_H
 
-#include <zigbee/packet_sink_scapy.h>
+#include <gnuradio/zigbee/packet_sink_scapy.h>
 
 //FIXME : GLOBAL..............
 static const unsigned int CHIP_MAPPING[] = {

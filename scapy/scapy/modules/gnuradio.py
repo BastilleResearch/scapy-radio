@@ -9,6 +9,7 @@ Gnuradio layers, sockets and send/receive functions.
 """
 
 import socket, struct
+import os
 import atexit
 from scapy.config import conf
 from scapy.data import MTU
@@ -84,17 +85,17 @@ def build_modulations_dict():
     grc_files = dict.fromkeys([x.rstrip(".grc") for x in os.listdir(conf.gr_mods_path) if x.endswith(".grc")], 0)
     topblocks = dict.fromkeys(
         [x for x in os.listdir(conf.gr_mods_path) if os.path.isdir(os.path.join(conf.gr_mods_path, x))], 0)
-    for x in grc_files.keys():
+    for x in list(grc_files.keys()):
         grc_files[x] = os.stat(os.path.join(conf.gr_mods_path, x + ".grc")).st_mtime
         try:
             os.mkdir(os.path.join(conf.gr_mods_path, x))
             topblocks[x] = 0
         except OSError:
             pass
-    for x in topblocks.keys():
+    for x in list(topblocks.keys()):
         topblocks[x] = os.stat(os.path.join(conf.gr_mods_path, x, 'top_block.py')).st_mtime if os.path.isfile(
             os.path.join(conf.gr_mods_path, x, 'top_block.py')) else 0
-    for x in grc_files.keys():
+    for x in list(grc_files.keys()):
         if grc_files[x] > topblocks[x]:
             outdir = "--directory=%s" % os.path.join(conf.gr_mods_path, x)
             input_grc = os.path.join(conf.gr_mods_path, x + ".grc")
@@ -102,7 +103,7 @@ def build_modulations_dict():
                 subprocess.check_call(["grcc", outdir, input_grc])
             except:
                 pass
-    for x in topblocks.keys():
+    for x in list(topblocks.keys()):
         if os.path.isfile(os.path.join(conf.gr_mods_path, x, 'top_block.py')):
             conf.gr_modulations[x] = os.path.join(conf.gr_mods_path, x, 'top_block.py')
 
@@ -115,16 +116,16 @@ def sigint_ignore():
 @conf.commands.register
 def gnuradio_set_vars(host="localhost", port=8080, **kargs):
     try:
-        import xmlrpclib
+        import xmlrpc.client
     except ImportError:
-        print "xmlrpclib is missing to use this function."
+        print("xmlrpclib is missing to use this function.")
     else:
-        s = xmlrpclib.Server("http://%s:%d" % (host, port))
-        for k, v in kargs.iteritems():
+        s = xmlrpc.client.Server("http://%s:%d" % (host, port))
+        for k, v in kargs.items():
             try:
                 getattr(s, "set_%s" % k)(v)
-            except xmlrpclib.Fault:
-                print "Unknown variable '%s'" % k
+            except xmlrpc.client.Fault:
+                print("Unknown variable '%s'" % k)
         s = None
 
 
@@ -136,17 +137,17 @@ def gnuradio_get_vars(*args, **kargs):
         kargs["port"] = 8080
     rv = {}
     try:
-        import xmlrpclib
+        import xmlrpc.client
     except ImportError:
-        print "xmlrpclib is missing to use this function."
+        print("xmlrpclib is missing to use this function.")
     else:
-        s = xmlrpclib.Server("http://%s:%d" % (kargs["host"], kargs["port"]))
+        s = xmlrpc.client.Server("http://%s:%d" % (kargs["host"], kargs["port"]))
         for v in args:
             try:
                 res = getattr(s, "get_%s" % v)()
                 rv[v] = res
-            except xmlrpclib.Fault:
-                print "Unknown variable '%s'" % v
+            except xmlrpc.client.Fault:
+                print("Unknown variable '%s'" % v)
         s = None
     if len(args) == 1:
         return rv[args[0]]
@@ -156,11 +157,11 @@ def gnuradio_get_vars(*args, **kargs):
 @conf.commands.register
 def gnuradio_stop_graph(host="localhost", port=8080):
     try:
-        import xmlrpclib
+        import xmlrpc.client
     except ImportError:
-        print "xmlrpclib is missing to use this function."
+        print("xmlrpclib is missing to use this function.")
     else:
-        s = xmlrpclib.Server("http://%s:%d" % (host, port))
+        s = xmlrpc.client.Server("http://%s:%d" % (host, port))
         s.stop()
         s.wait()
 
@@ -168,15 +169,15 @@ def gnuradio_stop_graph(host="localhost", port=8080):
 @conf.commands.register
 def gnuradio_start_graph(host="localhost", port=8080):
     try:
-        import xmlrpclib
+        import xmlrpc.client
     except ImportError:
-        print "xmlrpclib is missing to use this function."
+        print("xmlrpclib is missing to use this function.")
     else:
-        s = xmlrpclib.Server("http://%s:%d" % (host, port))
+        s = xmlrpc.client.Server("http://%s:%d" % (host, port))
         try:
             s.start()
-        except xmlrpclib.Fault as e:
-            print "ERROR: %s" % e.faultString
+        except xmlrpc.client.Fault as e:
+            print("ERROR: %s" % e.faultString)
 
 
 @conf.commands.register
@@ -187,9 +188,9 @@ def switch_radio_protocol(layer, *args, **kargs):
     if not hasattr(conf, 'gr_process_io') or conf.gr_process_io is None:
         conf.gr_process_io = {'stdout': open('/tmp/gnuradio.log', 'w+'), 'stderr': open('/tmp/gnuradio-err.log', 'w+')}
     if layer not in conf.gr_modulations:
-        print ""
-        print "Available layers: %s" % ", ".join(conf.gr_modulations.keys())
-        print ""
+        print("")
+        print("Available layers: %s" % ", ".join(list(conf.gr_modulations.keys())))
+        print("")
         raise AttributeError("Unknown radio layer %s" % layer)
     if conf.gr_process is not None:
         # An instance is already running
@@ -207,7 +208,7 @@ def gnuradio_exit(c):
     if hasattr(c, "gr_process") and hasattr(c.gr_process, "kill"):
         c.gr_process.kill()
     if hasattr(c, "gr_process_io") and c.gr_process_io is dict:
-        for k in c.gr_process_io.keys():
+        for k in list(c.gr_process_io.keys()):
             if c.gr_process_io[k] is file and not c.gr_process_io[k].closed:
                 c.gr_process_io[k].close()
                 c.gr_process_io[k] = None

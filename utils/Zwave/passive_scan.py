@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 
 # Copyright (C) Airbus DS CyberSecurity
 # Authors: Jean-Michel Picod, Arnaud Lebrun, Jonathan Christofer Demay
@@ -20,18 +20,18 @@ import sys
 def display(seen):
     for home_network in seen:
         print("******************* NEW NETWORK *******************")
-        print("Homeid: " + str(home_network))
+        print(("Homeid: " + str(home_network)))
         for dev in seen[home_network]:
-            print "Device:		"
-            print "\tDevice ID: " + str(dev)
-            print "\tTalks to: ",
-            print ", ".join([str(x) for x in seen[home_network][dev].send_to])
-            print "\tReceives from: ",
-            print ", ".join([str(x) for x in seen[home_network][dev].rec_from])
-            print "\tCommand available:"
-            print os.linesep.join(["\t\t%s" % c for c in _seen[home_network][dev].type])
+            print("Device:		")
+            print("\tDevice ID: " + str(dev))
+            print("\tTalks to: ", end=' ')
+            print(", ".join([str(x) for x in seen[home_network][dev].send_to]))
+            print("\tReceives from: ", end=' ')
+            print(", ".join([str(x) for x in seen[home_network][dev].rec_from]))
+            print("\tCommand available:")
+            print(os.linesep.join(["\t\t%s" % c for c in _seen[home_network][dev].type]))
 
-        print "***************************************************"
+        print("***************************************************")
 
 
 class Zwave_device(object):
@@ -67,7 +67,7 @@ class Zwave_device(object):
 
 def handle_packets(packet, seen):
     if packet.homeid not in seen:
-        print "[+] New Zwave network: " + str(packet.homeid)
+        print("[+] New Zwave network: " + str(packet.homeid))
         seen[packet.homeid] = dict()
     for dev in (packet.src, packet.dst):
         if dev not in seen[packet.homeid]:

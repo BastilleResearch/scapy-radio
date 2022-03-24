@@ -17,7 +17,7 @@
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
 install(FILES
-    Zwave_packet_sink.xml
-    Zwave_preamble.xml
-    Zwave_packet_sink_9_6.xml DESTINATION share/gnuradio/grc/blocks
+    Zwave_packet_sink.block.yml
+    Zwave_preamble.block.yml
+    Zwave_packet_sink_9_6.block.yml DESTINATION share/gnuradio/grc/blocks
 )
