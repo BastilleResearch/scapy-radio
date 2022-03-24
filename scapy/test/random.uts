@@ -1,0 +1,230 @@
+% Regression tests for Scapy random objects
+
+############
+############
++ Random objects
+
+= RandomEnumeration
+
+ren = RandomEnumeration(0, 7, seed=0x2807, forever=False)
+[x for x in ren] == ([3, 4, 2, 5, 1, 6, 0, 7] if six.PY2 else [5, 0, 2, 7, 6, 3, 1, 4])
+
+= RandIP6
+
+random.seed(0x2807)
+r6 = RandIP6()
+assert(r6 == ("d279:1205:e445:5a9f:db28:efc9:afd7:f594" if six.PY2 else
+              "240b:238f:b53f:b727:d0f9:bfc4:2007:e265"))
+assert(r6.command() == "RandIP6()")
+
+random.seed(0x2807)
+r6 = RandIP6("2001:db8::-")
+assert(r6 == ("2001:0db8::e445" if six.PY2 else "2001:0db8::b53f"))
+assert(r6.command() == "RandIP6(ip6template='2001:db8::-')")
+
+r6 = RandIP6("2001:db8::*")
+assert(r6 == ("2001:0db8::efc9" if six.PY2 else "2001:0db8::bfc4"))
+assert(r6.command() == "RandIP6(ip6template='2001:db8::*')")
+
+= RandMAC
+
+random.seed(0x2807)
+rm = RandMAC()
+assert(rm == ("d2:12:e4:5a:db:ef" if six.PY2 else "24:23:b5:b7:d0:bf"))
+assert(rm.command() == "RandMAC()")
+
+rm = RandMAC("00:01:02:03:04:0-7")
+assert(rm == ("00:01:02:03:04:05" if six.PY2 else "00:01:02:03:04:01"))
+assert(rm.command() == "RandMAC(template='00:01:02:03:04:0-7')")
+
+
+= RandOID
+
+random.seed(0x2807)
+ro = RandOID()
+assert(ro == "7.222.44.194.276.116.320.6.84.97.31.5.25.20.13.84.104.18")
+assert(ro.command() == "RandOID()")
+
+ro = RandOID("1.2.3.*")
+assert(ro == "1.2.3.41")
+assert(ro.command() == "RandOID(fmt='1.2.3.*')")
+
+ro = RandOID("1.2.3.0-28")
+assert(ro == ("1.2.3.11" if six.PY2 else "1.2.3.12"))
+assert(ro.command() == "RandOID(fmt='1.2.3.0-28')")
+
+ro = RandOID("1.2.3.0-28", depth=RandNumExpo(0.2), idnum=RandNumExpo(0.02))
+assert(ro.command() == "RandOID(fmt='1.2.3.0-28', depth=RandNumExpo(lambd=0.2), idnum=RandNumExpo(lambd=0.02))")
+
+= RandRegExp
+~ not_pyannotate
+
+random.seed(0x2807)
+rex = RandRegExp("[g-v]* @? [0-9]{3} . (g|v)")
+bytes(rex) == ('vmuvr @ 906 \x9e g' if six.PY2 else b'irrtv @ 517 \xc2\xb8 v')
+assert(rex.command() == "RandRegExp(regexp='[g-v]* @? [0-9]{3} . (g|v)')")
+
+rex = RandRegExp("[:digit:][:space:][:word:]")
+assert re.match(b"\\d\\s\\w", bytes(rex))
+
+= Corrupted(Bytes|Bits)
+
+random.seed(0x2807)
+cb = CorruptedBytes("ABCDE", p=0.5)
+assert(cb.command() == "CorruptedBytes(s='ABCDE', p=0.5)")
+assert(sane(raw(cb)) in [".BCD)", "&BCDW"])
+
+cb = CorruptedBits("ABCDE", p=0.2)
+assert(cb.command() == "CorruptedBits(s='ABCDE', p=0.2)")
+assert(sane(raw(cb)) in ["ECk@Y", "QB.P."])
+
+= RandEnumKeys
+random.seed(0x2807)
+rek = RandEnumKeys({'a': 1, 'b': 2, 'c': 3}, seed=0x2807)
+rek.enum.sort()
+assert(rek.command() == "RandEnumKeys(enum=['a', 'b', 'c'], seed=10247)")
+r = str(rek)
+assert(r == ('c' if six.PY2 else 'a'))
+
+= RandSingNum
+random.seed(0x2807)
+rs = RandSingNum(-28, 7)
+assert(rs._fix() in [2, 3])
+assert(rs.command() == "RandSingNum(mn=-28, mx=7)")
+
+= Rand*
+random.seed(0x2807)
+rss = RandSingString()
+assert(rss == ("CON:" if six.PY2 else "foo.exe:"))
+assert(rss.command() == "RandSingString()")
+
+random.seed(0x2807)
+rts = RandTermString(4, "scapy")
+assert(sane(raw(rts)) in ["...Zscapy", "$#..scapy"])
+assert(rts.command() == "RandTermString(size=4, term=%s'scapy')" % '' if six.PY2 else 'b')
+
+= RandInt (test __bool__)
+a = "True" if RandNum(False, True) else "False"
+assert a in ["True", "False"]
+
+= Various volatiles
+
+random.seed(0x2807)
+rng = RandNumGamma(1, 42)
+assert rng._fix() in (8, 73)
+assert rng.command() == "RandNumGamma(alpha=1, beta=42)"
+
+random.seed(0x2807)
+rng = RandNumGauss(1, 42)
+assert rng._fix() == 8
+assert rng.command() == "RandNumGauss(mu=1, sigma=42)"
+
+renum = RandEnum(1, 42, seed=0x2807)
+assert renum == (13 if six.PY2 else 37)
+assert renum.command() == "RandEnum(min=1, max=42, seed=10247)"
+
+rp = RandPool((IncrementalValue(), 42), (IncrementalValue(), 0))
+assert rp == 0
+assert rp.command() == "RandPool((IncrementalValue(), 42), (IncrementalValue(), 0))"
+
+de = DelayedEval("3 + 1")
+assert de == 4
+assert de.command() == "DelayedEval(expr='3 + 1')"
+
+v = IncrementalValue(restart=2)
+assert v == 0 and v == 1 and v == 2 and v == 0
+assert v.command() == "IncrementalValue(restart=2)"
+
+= CyclicPattern charset 0
+
+cs0 = b'AAAaAA0AABAAbAA1AACAAcAA2AADAAdAA3AAEAAeAA4AAFAAfAA5AAGAAgAA6AAHAAhAA7AAIAAiAA8AAJAAjAA9AAKAAkAALAAlAAMAAmAANAAnAAOAAoAAPAApAAQAAqAARAArAASAAsAATAAtAAUAAuAAVAAvAAWAAwAAXAAxAAYAAyAAZAAzAaaAa0AaBAabAa1AaCAacAa2AaDAadAa3AaEAaeAa4AaFAafAa5AaGAagAa6AaHAahAa7AaIAaiAa8AaJ'
+
+p = Raw(load=CyclicPattern())
+b = bytes(p)
+if len(b):
+    if len(b) > len(cs0):
+        assert cs0 in b
+    else:
+        assert b in cs0 or b == cs0
+
+p = Raw(load=CyclicPattern(5))
+b = bytes(p)
+assert len(b) == 5
+assert b == b'AAAaA'
+
+p = Raw(load=CyclicPattern(2, 3))
+b = bytes(p)
+print(b)
+assert len(b) == 2
+assert b == b'aA'
+
+= CyclicPattern charset 1
+
+cs1 = b'AAA%AAsAABAA$AAnAACAA-AA(AADAA;AA)AAEAAaAA0AAFAAbAA1AAGAAcAA2AAHAAdAA3AAIAAeAA4AAJAAfAA5AAKAAgAA6AALAAhAA7AAMAAiAA8AANAAjAA9AAOAAkAAPAAlAAQAAmAARAAoAASAApAATAAqAAUAArAAVAAtAAWAAuAAXAAvAAYAAwAAZAAxAAyAAzA%%A%sA%BA%$A%nA%CA%-A%(A%DA%;A%)A%EA%aA%0A%FA%bA%1A%GA%'
+
+p = Raw(load=CyclicPattern(None, 0, 1))
+b = bytes(p)
+if len(b):
+    if len(b) > len(cs1):
+        assert cs1 in b
+    else:
+        assert b in cs1 or b == cs1
+
+p = Raw(load=CyclicPattern(10, 0, 1))
+b = bytes(p)
+assert len(b) == 10
+assert b == b'AAA%AAsAAB'
+
+p = Raw(load=CyclicPattern(2, 8, 1))
+b = bytes(p)
+print(b)
+assert len(b) == 2
+assert b == b'AB'
+
+= CyclicPattern charset 2
+
+cs2 = b'AAAaAA0AA!AABAAbAA1AA"AACAAcAA2AA#AADAAdAA3AA$AAEAAeAA4AA%AAFAAfAA5AA&AAGAAgAA6AA\'AAHAAhAA7AA(AAIAAiAA8AA)AAJAAjAA9AA*AAKAAkAA+AALAAlAA,AAMAAmAA-AANAAnAA.AAOAAoAA/AAPAApAA:AAQAAqAA;AARAArAA<AASAAsAA=AATAAtAA>AAUAAuAA?AAVAAvAA@AAWAAwAA[AAXAAxAA\\AAYAAyAA]AAZAAzAA^AA_AA`AA{AA|AA}AA~AaaAa0Aa!AaBAabAa1Aa"Aa'
+
+p = Raw(load=CyclicPattern(None, 0, 2))
+b = bytes(p)
+if len(b):
+    if len(b) > len(cs2):
+        assert cs2 in b
+    else:
+        assert b in cs2 or b == cs2
+
+p = Raw(load=CyclicPattern(10, 0, 2))
+b = bytes(p)
+assert len(b) == 10
+assert b == b'AAAaAA0AA!'
+
+p = Raw(load=CyclicPattern(2, 8, 2))
+b = bytes(p)
+print(b)
+assert len(b) == 2
+assert b == b'A!'
+
+= CyclicPattern command
+
+p = Raw(load=CyclicPattern(2, 8, 2))
+cmd = p.command()
+
+assert "charset_type=2" in cmd
+assert "start=8" in cmd
+assert "size=2" in cmd
+
+p = Raw(load=CyclicPattern(2))
+cmd = p.command()
+
+assert "charset_type" not in cmd
+assert "start" not in cmd
+assert "size=2" in cmd
+
+p = Raw(load=CyclicPattern())
+cmd = p.command()
+
+assert "charset_type" not in cmd
+assert "start" not in cmd
+assert "size" not in cmd
+
+

@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 
 # Copyright (C) Airbus DS CyberSecurity
 # Authors: Jean-Michel Picod, Arnaud Lebrun, Jonathan Christofer Demay
@@ -24,13 +24,13 @@ class Stop_alarm(Automaton):
     def BEGIN(self):
         switch_radio_protocol("Zwave")
         self.last_pkt = None
-        print "BEGIN"
+        print("BEGIN")
         raise self.WAITING()
 
     @ATMT.state()
     def WAITING(self):
         """Wait for the turn on frame """
-        print "WAITING"
+        print("WAITING")
 
     @ATMT.receive_condition(WAITING)
     def alarm_on(self, packet_receive):
@@ -46,7 +46,7 @@ class Stop_alarm(Automaton):
     @ATMT.action(alarm_on)
     def alarm_off(self):
         time.sleep(0.5)
-        print "SWITCH ALARM OFF "
+        print("SWITCH ALARM OFF ")
         pkt = self.last_pkt[ZWaveReq].copy()
         pkt[ZWaveSwitchBin].val = "OFF"
         pkt.seqn += 1

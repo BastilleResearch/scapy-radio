@@ -48,7 +48,7 @@ namespace gr {
     {
         message_port_register_in(pmt::mp("in"));
         message_port_register_out(pmt::mp("out"));
-        set_msg_handler(pmt::mp("in"), boost::bind(&strip_gr_header_impl::make_frame, this, _1));
+        set_msg_handler(pmt::mp("in"), [this](pmt::pmt_t msg) { this->make_frame(msg); });
     }
 
     /*

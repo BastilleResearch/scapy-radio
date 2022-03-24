@@ -18,7 +18,7 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
-    bt4le_packet_sink.xml
-    bt4le_preamble_prefixer.xml
-    bt4le_whitening.xml DESTINATION share/gnuradio/grc/blocks
+    bt4le_packet_sink.block.yml
+    bt4le_preamble_prefixer.block.yml
+    bt4le_whitening.block.yml DESTINATION share/gnuradio/grc/blocks
 )

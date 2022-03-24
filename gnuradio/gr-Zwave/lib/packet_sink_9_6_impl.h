@@ -22,7 +22,7 @@
 #ifndef INCLUDED_ZWAVE_PACKET_SINK_9_6_IMPL_H
 #define INCLUDED_ZWAVE_PACKET_SINK_9_6_IMPL_H
 
-#include <Zwave/packet_sink_9_6.h>
+#include <gnuradio/Zwave/packet_sink_9_6.h>
 
 #define MAX_PDU_SIZE 47 //frame size not pdu
 

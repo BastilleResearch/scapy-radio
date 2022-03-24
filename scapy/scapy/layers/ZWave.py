@@ -11,6 +11,7 @@ Wireless Z-Wave.
 from scapy.packet import *
 from scapy.fields import *
 import struct
+from functools import reduce
 
 _COMMAND_CLASS = {
     0x00: "NO_OPERATION",
@@ -113,7 +114,7 @@ class BaseZWave(Packet):
         BitField("headertype", 0, 4),
         BitField("reserved", 0, 1),
         BitField("beam_control", 0, 2),
-        BitField("reserved", 0, 1),
+        BitField("reserved_", 0, 1),
         BitField("seqn", 1, 4),
         XByteField("length", None),
         XByteField("dst", 0x02),

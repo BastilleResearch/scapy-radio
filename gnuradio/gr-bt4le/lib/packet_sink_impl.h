@@ -22,7 +22,7 @@
 #ifndef INCLUDED_BT4LE_PACKET_SINK_IMPL_H
 #define INCLUDED_BT4LE_PACKET_SINK_IMPL_H
 
-#include <bt4le/packet_sink.h>
+#include <gnuradio/bt4le/packet_sink.h>
 #include <vector>
 
 #define MAX_PDU_SIZE 47 //frame size not pdu

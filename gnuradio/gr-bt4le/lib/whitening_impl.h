@@ -22,7 +22,7 @@
 #ifndef INCLUDED_BT4LE_WHITENING_IMPL_H
 #define INCLUDED_BT4LE_WHITENING_IMPL_H
 
-#include <bt4le/whitening.h>
+#include <gnuradio/bt4le/whitening.h>
 
 namespace gr {
   namespace bt4le {

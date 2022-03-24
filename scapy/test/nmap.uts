@@ -1,0 +1,89 @@
+% Regression tests for Scapy Nmap module
+
+~ nmap
+
+############
+############
++ Basic Nmap OS fingerprints tests
+
+= Module loading
+load_module('nmap')
+
+= Test functions
+
+d = nmap_udppacket_sig(IP()/UDP(), IP(raw(IP()/ICMP(type=3, code=2)/IPerror()/UDPerror())))
+assert len(d) == 9
+
+d = nmap_tcppacket_sig(IP()/TCP())
+assert len(d) == 5
+
+= Fetch database
+~ netaccess
+
+from __future__ import print_function
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
+
+filename = 'nmap-os-fingerprints' + str(RandString(6))
+
+def _test():
+    with open(filename, 'wb') as fd:
+        fd.write(urlopen('https://raw.githubusercontent.com/nmap/nmap/9efe1892/nmap-os-fingerprints').read())
+
+retry_test(_test)
+
+conf.nmap_base = filename
+
+= Database loading
+~ netaccess
+
+print(conf.nmap_kdb.base, conf.nmap_kdb.filename, len(conf.nmap_kdb.get_base()))
+assert len(conf.nmap_kdb.get_base()) > 100
+
+= fingerprint test: www.secdev.org
+~ netaccess needs_root
+score, fprint = nmap_fp('www.secdev.org')
+print(score, fprint)
+assert score > 0.5
+assert fprint
+
+= fingerprint test: gateway
+~ netaccess needs_root
+score, fprint = nmap_fp(conf.route.route('0.0.0.0')[2])
+print(score, fprint)
+assert score > 0.5
+assert fprint
+
+= fingerprint test: to text
+~  netaccess needs_root
+
+import re as re_
+
+a = nmap_sig("www.secdev.org", 80, 81)
+a
+for x in nmap_sig2txt(a).split("\n"):
+    assert re_.match(r"\w{2,4}\(.*\)", x)
+
+= nmap_udppacket_sig test: www.google.com
+~ netaccess needs_root
+
+a = nmap_sig("www.google.com", ucport=80)
+assert len(a) > 3
+assert len(a["PU"]) > 0
+
++ Nmap errors triggering
+
+= Nmap base not available
+
+conf.nmap_kdb.filename = "invalid"
+conf.nmap_kdb.reload()
+assert conf.nmap_kdb.filename == None
+
+= Clear temp files
+try:
+    os.remove('nmap-os-fingerprints')
+except:
+    pass
+
