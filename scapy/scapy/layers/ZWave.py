@@ -118,7 +118,7 @@ class BaseZWave(Packet):
         XByteField("length", None),
         XByteField("dst", 0x02),
     ]
-
+    crc = None
     def post_build(self, p, pay):
         # Switch payload and CRC
         crc = p[-1]
